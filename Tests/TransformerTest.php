@@ -45,5 +45,20 @@ class TransformerTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(array_key_exists('result', $result));
         $this->assertEquals('test1|test2|test3', $result['result']);
     }
+    
+    public function testAddMultipleTransformers() {
+        
+        $transformers = array(
+            new Transformers\RemoveKeyTransformer('test'),
+            new Transformers\RemoveKeyTransformer('test2')
+        );
+        $this->object->addTransformers($transformers);
+
+        $result = $this->object->transform();
+
+        $this->assertEquals(count($this->object->getTransformers()), 2);
+        $this->assertFalse(array_key_exists('test', $result));
+        $this->assertFalse(array_key_exists('test2', $result));
+    }
 
 }

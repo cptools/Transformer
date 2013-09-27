@@ -36,8 +36,6 @@ namespace CPTools\Transformer;
 
 use CPTools\Transformer\Interfaces\ITransformer;
 
-use ArrayObject;
-
 /**
  * Transformation Scheme Transformer
  * 
@@ -47,7 +45,7 @@ use ArrayObject;
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link     http://www.crazyball.fr
  */
-class Transformer extends ArrayObject {
+class Transformer extends \ArrayObject implements ITransformer {
 
     /**
      * Transformers List
@@ -65,14 +63,15 @@ class Transformer extends ArrayObject {
      */
     public function __construct(array $array) {
         parent::__construct($array);
-        $this->setFlags(ArrayObject::ARRAY_AS_PROPS);
+        $this->setFlags(\ArrayObject::ARRAY_AS_PROPS);
     }
 
     /**
      * Return the Transformed Data Table 
+     * 
      * @return array
      */
-    public function transform() {
+    public function transform(array $data = null) {
         $result = $this->getArrayCopy();
         foreach ($this->_transformers as $transformer) {
             $result = $transformer->transform($result);
@@ -85,7 +84,7 @@ class Transformer extends ArrayObject {
      * 
      * @param ITransformer $transformer Transformer to add
      * 
-     * @return Container
+     * @return Transformer
      */
     public function addTransformer(ITransformer $transformer) {
         $this->_transformers[] = $transformer;
@@ -95,9 +94,9 @@ class Transformer extends ArrayObject {
     /**
      * Add many Transformers
      * 
-     * @param array $transformers Transformers Array
+     * @param Transformer[] $transformers Transformers Array
      * 
-     * @return TransformerMap 
+     * @return Transformer 
      * 
      * @throws \InvalidArgumentException If an array element not instance of ITransformer
      */
@@ -108,12 +107,21 @@ class Transformer extends ArrayObject {
             }
 
             if (!$transformer instanceof ITransformer) {
-                throw new InvalidArgumentException("Transformer must implement Transformer Interface");
+                throw new \InvalidArgumentException("Transformer must implement Transformer Interface");
             }
 
             $this->_transformers[] = $transformer;
         }
         return $this;
+    }
+
+    /**
+     * Retourne la liste des transformers de l'objet
+     * 
+     * @return Transformer[]
+     */
+    public function getTransformers() {
+        return $this->_transformers;
     }
 
 }
